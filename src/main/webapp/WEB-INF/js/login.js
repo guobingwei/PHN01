@@ -1,0 +1,54 @@
+$(document).ready(function(){
+	
+	//enter键提交内容
+	$("input[name=username]").focus();
+	var $inp = $('input');
+    $inp.keypress(function (e) { //这里给function一个事件参数命名为e，叫event也行，随意的，e就是IE窗口发生的事件。 
+		var key = e.which; //e.which是按键的值 
+		if (key == 13) { 
+		LoginHandle();
+		} 
+    }); 
+    
+    //通过点击按钮提交内容
+    $("#loginBtn").click(function(){
+		LoginHandle();
+    });
+    
+    //登录的处理方法
+    function LoginHandle() {
+    	console.log("login");
+		var username = $("input[name=username]").val();
+		var password = hex_md5($("input[name=password]").val());
+		var user = {
+			"username" : username,
+			"password" : password
+		};
+		$.ajax({
+			type : "post",
+			dataType : "json",
+			data : user,
+			contentType : "application/x-www-form-urlencoded;charset=UTF-8",
+			url : "user/login",
+			// 同步async: false,（默认是true）;
+			// 如上：false为同步，这个方法中的Ajax请求将整个浏览器锁死，
+			// 只有test.jsp执行结束后，才可以执行其它操作。
+			async : false,
+			success : function(data) {
+				if (false == data.loginResult) {
+					alert("用户名或者密码错误，请重新登录！");
+				} else if (true == data.loginResult) {
+					alert("用户名:" + user.username + "密码:" + user.password);
+					var indexUrl = window.location.protocol+"//"+window.location.host+window.location.pathname+"navigation/find.do";
+					window.location = indexUrl;
+				}
+			},
+			error : function() {
+				alert("服务器发生故障，请尝试重新登录！");
+			}
+		});
+    }       
+});
+
+
+
